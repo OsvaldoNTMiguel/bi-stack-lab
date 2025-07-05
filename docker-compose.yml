@@ -1,22 +1,22 @@
 version: '3.8'
 
 services:
-  # 🗂️ Armazenamento de objetos S3 compatível
+  # 🗂️ Armazenamento de objetos estilo S3
   minio:
     image: minio/minio:RELEASE.2025-04-22T22-12-26Z
     command: server /data --console-address ":9001"
     ports:
-      - "9000:9000"   # API
-      - "9001:9001"   # Console web
+      - "9000:9000"  # API S3
+      - "9001:9001"  # Painel web
     environment:
       MINIO_ROOT_USER: admin
       MINIO_ROOT_PASSWORD: password
 
-  # ⚡ Engine distribuído de processamento de dados
+  # ⚡ Engine de processamento de dados
   spark:
-    image: bitnami/spark:latest
+    image: bitnami/spark:3.5.1
     ports:
-      - "8080:8080"   # UI do Spark Master
+      - "8080:8080"  # Spark Master UI
 
   # 🔄 Orquestrador de workflows
   airflow:
@@ -25,30 +25,30 @@ services:
       - AIRFLOW__CORE__EXECUTOR=SequentialExecutor
       - AIRFLOW__WEBSERVER__RBAC=True
     ports:
-      - "8088:8080"   # UI do Airflow
+      - "8088:8080"  # UI do Airflow
 
-  # 📊 Plataforma de visualização de dados
+  # 📊 Plataforma de dashboarding
   superset:
-    image: apache/superset
+    image: apache/superset:3.0.1
     ports:
-      - "8081:8088"   # UI do Superset
+      - "8081:8088"  # UI do Superset
     environment:
       - SUPERSET_SECRET_KEY=your-secret-key
-      - DATABASE_URL=sqlite:///superset.db  # Para testes locais
+      - DATABASE_URL=sqlite:///superset.db
 
-  # 📈 BI simples e direto ao ponto
+  # 📈 Análise e visualização self-service
   metabase:
-    image: metabase/metabase
+    image: metabase/metabase:v0.49.11
     ports:
-      - "3000:3000"   # UI do Metabase
+      - "3000:3000"  # UI do Metabase
 
-  # 🧠 Motor de consulta de dados analíticos
+  # 🧠 Engine analítico para queries OLAP
   druid:
-    image: apache/druid:latest
+    image: apache/druid:27.0.0
     ports:
-      - "9090:8081"   # UI do Druid
+      - "9090:8081"  # UI do Druid
 
-  # 🔎 Catálogo de metadados e observabilidade
+  # 🧾 Catálogo de metadados e observabilidade
   openmetadata:
     image: docker.getcollate.io/openmetadata/server:1.2.4
     ports:
